@@ -1,0 +1,35 @@
+<div class="integration-guides">
+    <h2>Integration Guides</h2>
+    
+    <section>
+        <h3>OBS Studio</h3>
+        <ol>
+            <li>Add a "Media Source"</li>
+            <li>Select the WebM overlay file</li>
+            <li>Enable "Loop" if needed</li>
+            <li>Adjust size and position</li>
+        </ol>
+    </section>
+    
+    <section>
+        <h3>Streamlabs</h3>
+        <!-- Similar instructions -->
+    </section>
+    
+    <section>
+        <h3>Custom Integration</h3>
+        <p>Use the JSON output to create custom visualizations:</p>
+        <pre><code>
+{
+    "messages": [
+        {
+            "timestamp": 1.5,
+            "text": "Hello!",
+            "position": {"x": 100, "y": 50},
+            "style": {...}
+        }
+    ]
+}
+        </code></pre>
+    </section>
+</div> 

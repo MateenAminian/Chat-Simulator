@@ -1,0 +1,42 @@
+app:
+  name: "LlamaChat"
+  temp_dir: "temp"
+  debug: false
+  max_file_size: 524288000  # 500MB in bytes
+
+paths:
+  outputs: "outputs"
+  cache: "cache"
+  assets: "assets"
+  emotes: "assets/emotes"
+  fonts: "assets/fonts"
+  logs: "logs"
+
+cache:
+  duration: 3600  # 1 hour in seconds
+  max_size: 1073741824  # 1GB in bytes
+
+ollama:
+  url: "http://localhost:11434"
+  model: "llava"
+  sample_interval: 2  # seconds between frame samples
+
+chat:
+  default_style: "twitch"
+  default_position: "bottom-right"
+  default_speed: 30  # messages per minute
+  default_chatters: 100
+  default_emote_frequency: 0.5
+  default_spam_level: 0.2
+
+logging:
+  level: "INFO"
+  file: "llama_chat.log"
+  max_size: 10485760  # 10MB
+  backup_count: 5
+
+performance:
+  max_workers: 4
+  gpu_enabled: true
+  frame_buffer_size: 30
+  batch_size: 10 

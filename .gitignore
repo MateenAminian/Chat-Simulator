@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+pip-wheel-metadata/
+
+# Virtual environments
+venv/
+llama_env/
+
+# Output, temp, and cache
+outputs/
+temp/
+cache/
+logs/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Model/data folders (if not needed in repo)
+models/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Node (if you ever add frontend JS)
+node_modules/
+
+# VSCode and IDE settings
+.vscode/
+.idea/

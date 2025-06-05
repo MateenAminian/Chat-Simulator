@@ -1,0 +1,24 @@
+# Core dependencies
+fastapi==0.109.1
+uvicorn==0.27.1
+python-multipart
+ollama==0.1.4
+
+# Video and image processing
+opencv-python>=4.5.3
+moviepy==1.0.3
+Pillow>=8.0.0
+
+# Machine learning and audio
+transformers>=4.15.0
+torch>=1.9.0
+torchaudio
+librosa>=0.8.0
+openai-whisper
+
+# Utilities
+numpy==1.26.4
+psutil>=5.8.0
+gputil>=1.4.0
+python-dotenv>=0.19.0
+requests>=2.26.0 

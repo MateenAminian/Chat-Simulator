@@ -1,0 +1,19 @@
+{
+  "assets": {
+    "emotes": {
+      "Kappa.png": "assets/emotes/Kappa.png",
+      "PogChamp.png": "assets/emotes/PogChamp.png",
+      "KEKW.png": "assets/emotes/KEKW.png",
+      "OMEGALUL.png": "assets/emotes/OMEGALUL.png",
+      "monkaS.png": "assets/emotes/monkaS.png",
+      "PepeLaugh.png": "assets/emotes/PepeLaugh.png",
+      "Sadge.png": "assets/emotes/Sadge.png",
+      "LULW.png": "assets/emotes/LULW.png",
+      "xqcL.png": "assets/emotes/xqcL.png",
+      "PeepoGlad.png": "assets/emotes/PeepoGlad.png"
+    },
+    "fonts": {
+      "Roboto-Regular.ttf": "assets/fonts/Roboto-Regular.ttf"
+    }
+  }
+}
