@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Simulator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .upload-section {
+            margin-bottom: 20px;
+            padding: 20px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .control-group {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .preview {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        input[type="range"] {
+            width: 100%;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Chat Simulator</h1>
+        
+        <div class="upload-section">
+            <h2>Upload Video</h2>
+            <input type="file" id="videoUpload" accept="video/*">
+            <p>Drag and drop a video file here or click to select</p>
+        </div>
+
+        <div class="controls">
+            <div class="control-group">
+                <h3>Chat Settings</h3>
+                <div>
+                    <label for="messagesPerMinute">Messages per Minute</label>
+                    <input type="range" id="messagesPerMinute" min="1" max="100" value="30">
+                    <span id="messagesPerMinuteValue">30</span>
+                </div>
+                <div>
+                    <label for="numChatters">Number of Chatters</label>
+                    <input type="range" id="numChatters" min="10" max="200" value="50">
+                    <span id="numChattersValue">50</span>
+                </div>
+            </div>
+
+            <div class="control-group">
+                <h3>Style Settings</h3>
+                <div>
+                    <label for="emoteFrequency">Emote Frequency</label>
+                    <input type="range" id="emoteFrequency" min="0" max="100" value="50">
+                    <span id="emoteFrequencyValue">50%</span>
+                </div>
+                <div>
+                    <label for="position">Chat Position</label>
+                    <select id="position">
+                        <option value="bottom-right">Bottom Right</option>
+                        <option value="bottom-left">Bottom Left</option>
+                        <option value="top-right">Top Right</option>
+                        <option value="top-left">Top Left</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <button id="generateBtn" disabled>Generate Chat Overlay</button>
+
+        <div class="preview">
+            <h2>Preview</h2>
+            <div id="previewContent">
+                No preview available yet. Upload a video to start.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update range input values
+        document.querySelectorAll('input[type="range"]').forEach(input => {
+            const valueSpan = document.getElementById(input.id + 'Value');
+            input.addEventListener('input', () => {
+                valueSpan.textContent = input.id === 'emoteFrequency' ? 
+                    input.value + '%' : input.value;
+            });
+        });
+
+        // Handle file upload
+        const videoUpload = document.getElementById('videoUpload');
+        const generateBtn = document.getElementById('generateBtn');
+
+        videoUpload.addEventListener('change', () => {
+            generateBtn.disabled = !videoUpload.files.length;
+        });
+
+        // Handle generate button click
+        generateBtn.addEventListener('click', async () => {
+            const formData = new FormData();
+            formData.append('video', videoUpload.files[0]);
+            formData.append('messages_per_minute', document.getElementById('messagesPerMinute').value);
+            formData.append('num_chatters', document.getElementById('numChatters').value);
+            formData.append('emote_frequency', document.getElementById('emoteFrequency').value / 100);
+            formData.append('position', document.getElementById('position').value);
+
+            try {
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    const previewContent = document.getElementById('previewContent');
+                    const videoUrl = `/download/${data.output_path}`;
+                    previewContent.innerHTML = `
+                        <a href="${videoUrl}" download>Download Processed Video</a><br><br>
+                        <video controls width="480">
+                            <source src="${videoUrl}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    `;
+                } else {
+                    alert('Error generating overlay: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        });
+    </script>
+</body>
+</html> 

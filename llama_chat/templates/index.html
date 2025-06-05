@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LlamaChat Video Processor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>LlamaChat Video Processor</h1>
+        
+        <div class="preview-container">
+            <video id="videoPreview" controls style="display: none;">
+                Your browser does not support the video tag.
+            </video>
+            <div id="previewPlaceholder">
+                Select a video to preview
+            </div>
+        </div>
+
+        <form id="uploadForm" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="video">Select Video:</label>
+                <input type="file" id="video" name="video" accept="video/*" required>
+            </div>
+
+            <div class="form-group">
+                <label for="messages_per_minute">Messages per Minute:</label>
+                <input type="number" id="messages_per_minute" name="messages_per_minute" 
+                       value="30" min="1" max="200">
+            </div>
+
+            <div class="form-group">
+                <label for="num_chatters">Number of Chatters:</label>
+                <input type="number" id="num_chatters" name="num_chatters" 
+                       value="100" min="1" max="1000">
+            </div>
+
+            <div class="form-group">
+                <label for="emote_frequency">Emote Frequency:</label>
+                <input type="range" id="emote_frequency" name="emote_frequency" 
+                       min="0" max="1" step="0.1" value="0.5">
+                <span id="emote_frequency_value">0.5</span>
+            </div>
+
+            <div class="form-group">
+                <label for="spam_level">Spam Level:</label>
+                <input type="range" id="spam_level" name="spam_level" 
+                       min="0" max="1" step="0.1" value="0.2">
+                <span id="spam_level_value">0.2</span>
+            </div>
+
+            <div class="form-group">
+                <label for="position">Chat Position:</label>
+                <select id="position" name="position">
+                    <option value="bottom-right">Bottom Right</option>
+                    <option value="bottom-left">Bottom Left</option>
+                    <option value="top-right">Top Right</option>
+                    <option value="top-left">Top Left</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="font_size">Font Size:</label>
+                <input type="number" id="font_size" name="font_size" 
+                       value="24" min="12" max="48">
+            </div>
+
+            <button type="submit">Process Video</button>
+        </form>
+
+        <div id="progress" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            <p id="status">Processing video...</p>
+        </div>
+    </div>
+
+    <script>
+        // Inline script to ensure it's loaded
+        document.getElementById('video').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const video = document.getElementById('videoPreview');
+                const placeholder = document.getElementById('previewPlaceholder');
+                
+                video.src = URL.createObjectURL(file);
+                video.style.display = 'block';
+                placeholder.style.display = 'none';
+            }
+        });
+
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const form = e.target;
+            const formData = new FormData(form);
+            const progress = document.getElementById('progress');
+            const status = document.getElementById('status');
+            const progressFill = document.querySelector('.progress-fill');
+            
+            try {
+                progress.style.display = 'block';
+                form.style.display = 'none';
+                
+                const response = await fetch('/process', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'chat_overlay_video.mp4';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                
+                form.reset();
+                form.style.display = 'block';
+                progress.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error:', error);
+                status.textContent = 'Error processing video: ' + error.message;
+                status.style.color = 'red';
+            }
+        });
+
+        // Update range input values
+        document.getElementById('emote_frequency').addEventListener('input', (e) => {
+            document.getElementById('emote_frequency_value').textContent = e.target.value;
+        });
+
+        document.getElementById('spam_level').addEventListener('input', (e) => {
+            document.getElementById('spam_level_value').textContent = e.target.value;
+        });
+    </script>
+</body>
+</html> 
