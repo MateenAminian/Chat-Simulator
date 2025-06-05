@@ -1,5 +1,5 @@
 import os
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, UploadFile, File, Form, HTTPException, WebSocket, WebSocketDisconnect, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, FileResponse
 from typing import Dict, Any, List
@@ -30,12 +30,12 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-# Global state
 class AppState:
-    def __init__(self):
-        self.current_video = None
-        self.chat_messages = []
-        self.overlay_progress = 0
+    """Global state for current video, chat messages, and overlay progress."""
+    def __init__(self) -> None:
+        self.current_video: str = None
+        self.chat_messages: List[Dict] = []
+        self.overlay_progress: int = 0
 
 state = AppState()
 
@@ -90,24 +90,25 @@ app.add_middleware(
 
 # WebSocket connection manager
 class ConnectionManager:
-    def __init__(self):
+    """Manages active WebSocket connections for progress updates."""
+    def __init__(self) -> None:
         self.active_connections: List[WebSocket] = []
 
-    async def connect(self, websocket: WebSocket):
+    async def connect(self, websocket: WebSocket) -> None:
         await websocket.accept()
         self.active_connections.append(websocket)
 
-    def disconnect(self, websocket: WebSocket):
+    def disconnect(self, websocket: WebSocket) -> None:
         self.active_connections.remove(websocket)
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
+    async def send_personal_message(self, message: str, websocket: WebSocket) -> None:
         await websocket.send_text(message)
 
-    async def broadcast(self, message: str):
+    async def broadcast(self, message: str) -> None:
         for connection in self.active_connections:
             await connection.send_text(message)
             
-    async def send_progress(self, progress: float, step: str, websocket: WebSocket):
+    async def send_progress(self, progress: float, step: str, websocket: WebSocket) -> None:
         data = {
             "type": "progress",
             "value": progress,
@@ -134,7 +135,11 @@ async def preview_chat(
     num_chatters: int = Form(SAFE_PROCESSING_LIMITS['num_chatters']['default']),
     emote_frequency: float = Form(SAFE_PROCESSING_LIMITS['emote_frequency']['default']),
     spam_level: float = Form(SAFE_PROCESSING_LIMITS['spam_level']['default'])
-):
+) -> JSONResponse:
+    """
+    Preview chat messages for an uploaded video without generating the overlay.
+    Returns a preview of the first 10 chat messages and video info.
+    """
     try:
         logger.info(f"Received video: {video.filename}")
         
@@ -189,7 +194,11 @@ async def process_video(
     num_chatters: int = Form(50),
     emote_frequency: float = Form(0.5),
     position: str = Form("bottom-right")
-):
+) -> Dict[str, Any]:
+    """
+    Process a video, generate chat messages, and create a combined overlay video.
+    Returns the output filename for download.
+    """
     try:
         # Create uploads directory if it doesn't exist
         uploads_dir = os.path.join("src", "temp", "uploads")
@@ -235,8 +244,10 @@ async def process_video(
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/download/{filename}")
-async def download_file(filename: str):
-    """Download generated overlay video"""
+async def download_file(filename: str) -> FileResponse:
+    """
+    Download a generated overlay video by filename.
+    """
     try:
         # Use the same output directory as the overlay generator
         file_path = os.path.join("src", "temp", "outputs", filename)
@@ -253,16 +264,20 @@ async def download_file(filename: str):
 
 # Add root route to serve index.html
 @app.get("/")
-async def root():
-    """Serve the main page"""
+async def root() -> FileResponse:
+    """
+    Serve the main page (index.html).
+    """
     return FileResponse("src/static/index.html")
 
 @app.post("/generate_chat")
 async def generate_chat(
     chatSpeed: int = Form(30),
     chatters: int = Form(50)
-):
-    """Generate chat messages based on video analysis"""
+) -> Dict[str, Any]:
+    """
+    Generate chat messages based on video analysis for the current uploaded video.
+    """
     try:
         if not state.current_video:
             raise HTTPException(status_code=400, detail="No video uploaded")

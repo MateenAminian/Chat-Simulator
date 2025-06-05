@@ -34,3 +34,7 @@ node_modules/
 # VSCode and IDE settings
 .vscode/
 .idea/
+
+# Environment variables
+.env
+*.env

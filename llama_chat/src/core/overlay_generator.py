@@ -2,7 +2,7 @@ import cv2
 import logging
 import time
 import os
-from typing import Dict, List
+from typing import Dict, List, Optional
 import numpy as np
 import re
 import random
@@ -12,52 +12,31 @@ import moviepy.editor as mpy
 logger = logging.getLogger(__name__)
 
 class OverlayGenerator:
-    def __init__(self, style: Dict):
+    """
+    Generates a Twitch-style chat overlay on video frames, stacking messages from the bottom up.
+    Handles message formatting, positioning, and overlay rendering.
+    """
+    def __init__(self, style: Dict) -> None:
+        """Initialize overlay generator with style and position settings."""
         self.style = style
         self.font = cv2.FONT_HERSHEY_SIMPLEX
-        self.font_scale = 0.45  # Keep font size
+        self.font_scale = 0.45
         self.thickness = 1
-        self.message_spacing = 25  # Reduced from 35
-        self.line_spacing = 15    # Reduced from 20
-        self.max_messages = 10     # Ensure 10 messages are visible
+        self.message_spacing = 25
+        self.line_spacing = 15
+        self.max_messages = 10
         self.output_dir = os.path.join("src", "temp", "outputs")
         os.makedirs(self.output_dir, exist_ok=True)
         self.progress = 0
-        
-        # Get position from style dict with default fallback
         self.position = style.get('position', 'bottom-left')
-        
-        # Define position mappings with coordinates and alignments
         self.position_settings = {
-            'bottom-left': {
-                'x_offset': 20,
-                'y_offset_from_bottom': 40,
-                'align': 'left'
-            },
-            'bottom-right': {
-                'x_offset': -20,  # Will be adjusted based on frame width
-                'y_offset_from_bottom': 40,
-                'align': 'right'
-            },
-            'top-left': {
-                'x_offset': 20,
-                'y_offset_from_top': 40,
-                'align': 'left'
-            },
-            'top-right': {
-                'x_offset': -20,  # Will be adjusted based on frame width
-                'y_offset_from_top': 40,
-                'align': 'right'
-            }
+            'bottom-left': {'x_offset': 20, 'y_offset_from_bottom': 40, 'align': 'left'},
+            'bottom-right': {'x_offset': -20, 'y_offset_from_bottom': 40, 'align': 'right'},
+            'top-left': {'x_offset': 20, 'y_offset_from_top': 40, 'align': 'left'},
+            'top-right': {'x_offset': -20, 'y_offset_from_top': 40, 'align': 'right'}
         }
-        
-        # Simple list of Twitch chat colors
         self.username_colors = [
-            '#FF0000',  # Red
-            '#0000FF',  # Blue
-            '#00FF00',  # Green
-            '#FF7F50',  # Coral
-            '#9ACD32'   # YellowGreen
+            '#FF0000', '#0000FF', '#00FF00', '#FF7F50', '#9ACD32'
         ]
         
         # Adjust chat area dimensions based on video type
@@ -74,17 +53,13 @@ class OverlayGenerator:
         }
         
     def clean_message(self, message: str) -> str:
-        """Clean message text"""
-        # Remove timestamp prefix
+        """Clean message text by removing timestamps and extra spaces."""
         message = re.sub(r'^\d+\.\d+s\s*', '', message)
-        
-        # Clean up extra spaces
         message = ' '.join(message.split())
-        
         return message.strip()
         
     def wrap_text(self, text: str, max_width: int) -> List[str]:
-        """Wrap text to fit within max_width pixels"""
+        """Wrap text to fit within max_width pixels using OpenCV text size."""
         words = text.split()
         lines = []
         current_line = []
@@ -117,7 +92,10 @@ class OverlayGenerator:
         return lines
 
     async def generate_overlay(self, video_path: str, messages: List[Dict]) -> str:
-        """Generate chat overlay"""
+        """
+        Generate a chat overlay video with messages stacked from the bottom up (Twitch style).
+        Returns the output filename.
+        """
         start_time = time.time()
         frame_count = 0
         
@@ -248,14 +226,14 @@ class OverlayGenerator:
             if 'out' in locals():
                 out.release()
                 
-    def _hex_to_bgr(self, hex_color):
-        """Convert hex color to BGR format for OpenCV"""
+    def _hex_to_bgr(self, hex_color: str) -> tuple:
+        """Convert hex color to BGR format for OpenCV."""
         hex_color = hex_color.lstrip('#')
         r, g, b = tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-        return (b, g, r)  # OpenCV uses BGR
+        return (b, g, r)
 
     def _format_message(self, message: Dict) -> tuple:
-        """Format message for display in the video, returning username and message separately"""
+        """Format message for display in the video, returning username and message separately."""
         username = message['username']
         message_text = message['message']
         return username, message_text

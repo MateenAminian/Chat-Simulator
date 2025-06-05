@@ -21,4 +21,21 @@ numpy==1.26.4
 psutil>=5.8.0
 gputil>=1.4.0
 python-dotenv>=0.19.0
-requests>=2.26.0 
+requests>=2.26.0
+# Linting
+flake8
+
+# Additional dependencies
+asyncio
+signal
+typing
+base64
+io
+json
+shutil
+logging
+uuid
+sys
+re
+hashlib
+subprocess 
