@@ -4,7 +4,7 @@ uvicorn
 opencv-python
 moviepy
 whisper
-ollama-client
+ollama
 numpy==1.26.4
 psutil>=5.8.0
 gputil>=1.4.0
@@ -24,16 +24,16 @@ librosa>=0.8.0
 openai-whisper
 
 # Utilities
-signal
-base64
-uuid
+# signal
+# base64
+# uuid
 
 # Linting
-asyncio
-typing
-json
-shutil
-logging
-re
-hashlib
-subprocess 
+# asyncio
+# typing
+# json
+# shutil
+# logging
+# re
+# hashlib
+# subprocess 
