@@ -1,6 +1,6 @@
-# Llama Chat Simulator
+# StreamChatter
 
-A FastAPI application that generates Twitch-like chat overlays for videos using Ollama.
+A powerful video processing application that generates context-aware, Twitch-style chat overlays for your videos. Using local LLMs (Ollama) for chat generation and advanced video processing techniques, StreamChatter creates engaging, realistic chat interactions that match your video content.
 
 ## Prerequisites
 

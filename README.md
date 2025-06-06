@@ -1,6 +1,6 @@
-# Chat Simulator
+# StreamChatter
 
-A powerful video processing application that generates context-aware, Twitch-style chat overlays for your videos. Using local LLMs (Ollama) for chat generation and advanced video processing techniques, Chat Simulator creates engaging, realistic chat interactions that match your video content.
+A powerful video processing application that generates context-aware, Twitch-style chat overlays for your videos. Using local LLMs (Ollama) for chat generation and advanced video processing techniques, StreamChatter creates engaging, realistic chat interactions that match your video content.
 
 ## 🌟 Features
 
