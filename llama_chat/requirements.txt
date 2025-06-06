@@ -2,7 +2,7 @@
 fastapi
 uvicorn
 opencv-python
-moviepy
+moviepy==1.0.3
 whisper
 ollama
 numpy==1.26.4
